@@ -7,7 +7,7 @@ fs.readFile('package.json', "utf-8", (error, data) => {
     } else {
         const info = {
             contenidoStr: JSON.stringify(data),
-            contenidoObj: data,
+            contenidoObj: JSON.parse(data),
             size: "Number",
         }
 
@@ -15,7 +15,8 @@ fs.readFile('package.json', "utf-8", (error, data) => {
         console.log(info)
 
         //Guardo el archivo
-        fs.writeFile("info.txt", info, (error) => {
+        //Un txt solo puede recibir un String
+        fs.writeFile("info.txt", JSON.stringify(info), (error) => {
             if (error) {
                 console.log("No se encontró el archivo")
             }
