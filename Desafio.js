@@ -1,6 +1,6 @@
 class Contenedor {
     constructor(fileName) {
-        //Nombre del archivo a trabajar
+        //Nombre del archivo
         this.fileName = fileName;
     }
 
@@ -8,63 +8,63 @@ class Contenedor {
     save(objeto) {
         //Importo el módulo fs
         const fs = require('fs');
-        fs.writeFileSync(this.fileName, objeto);
-        return objeto.id
+        fs.writeFileSync(this.fileName, JSON.stringify(objeto, null, 2), (error) => {
+            if (error) {
+                throw new Error("No se guaró el archivo");
+            } else {
+                //No logro devolver el id del objeto me devuelve undefined                
+                return objeto.id
+            }
+        });
     }
 
-    getById(idInserted){
-        if (objeto.id == idInserted){
-            return objeto;
-        } else {
-            "No se encontró ningún objeto con ese id"
-        }
-    }
+    // getById(id){
+    //     //No se como obtener la información del objeto
+    //     const resultObject = this.objeto.find(object => object.id === id);
+    //     if (resultObject !== null){
+    //         return resultObject
+    //     } return null
+    // }
 
     getAll(){
         const fs = require('fs');
-        textFile = fs.readFileSync("fileName" , "utf-8", (error,contenido) => {
+        fs.readFile(this.fileName, "utf-8", (error, data) => {
             if(error){
-                "No se encontró un archivo con ese nombre"
+                return "No se encontró el archivo " + this.fileName
             } else {
-                console.log("[", contenido , "]")
+                //No logro mostrar el array completo del archivo, me devuelve undefined
+                return JSON.parse(data)
             }
         })
     }
 
-    deleteById(idToDelete){
-        const fs = require('fs');
-        fs.unlink("fileName", error => {
-            if (error){
-                "No se encontró ningún archivo con ese id"
-            } else {
-                console.log("¡Borrado!")
-            }
-        })
-    }
+    // deleteById(id){
+    //     const fs = require('fs');
+    //     fs.unlink("fileName", error => {
+    //         if (error){
+    //             "No se encontró ningún archivo con ese id"
+    //         } else {
+    //             console.log("¡Borrado!")
+    //         }
+    //     })
+    // }
 
-    deleteAll(){ }
+    // deleteAll(){ }
 }
 
-let objetoContenedor = new Contenedor(
-    "Archvo del Desafio 2",
-)
-
-let agregoObjeto = objetoContenedor.save(
-    [
-        {
-            title: "Heladera",
-            price: 80000,
-            id: 1,
-        },
-        {
-            title: "Lavarropas",
-            price: 60000,
-            id: 2,
-        }        
-    ]        
-)
-
-let buscoId = objetoContenedor.getById(1)
-
+let objetoContenedor = new Contenedor( "ArchvoDesafio.txt" )
+let objetoParaElContenedor = [
+    {
+        title: "Heladera",
+        price: 80000,
+        id: 1,
+    }
+];
+let agregoObjeto = objetoContenedor.save(objetoParaElContenedor)
 console.log(agregoObjeto)
-console.log(buscoId)
+
+// let buscoObjetoConId = objetoContenedor.getById(2)
+// console.log(buscoObjetoConId)
+
+let arrayConTodosLosObjetos = objetoContenedor.getAll()
+console.log(arrayConTodosLosObjetos)
