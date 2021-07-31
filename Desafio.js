@@ -1,75 +1,94 @@
+//Productos
+let p1 = {
+  title: "Heladera",
+  price: 80000,
+};
+
+let p2 = {
+  title: "Lavarropas",
+  price: 60000,
+};
+
+//Importo el módulo fs
+const fs = require("fs");
+
 class Contenedor {
   constructor(fileName) {
     //Nombre del archivo
     this.fileName = fileName;
-    this.array = [];
-    this.counter = 1;
+    this.id = 0;
+    this.data = [];
   }
 
   //Métodos
-  save(objeto) {
-    //Importo el módulo fs
-    const fs = require("fs");
-    //Agrego el id al objeto
-    objeto.id = this.counter;
-    this.array.push(objeto);
-    fs.writeFileSync(
-      this.fileName,
-      JSON.stringify(this.array, null, 2),
-      (error) => {
-        throw new Error("No se guardó el archivo. Error:", error);
-      }
-    );
-    //Aumento id
-    this.counter++;
-    return objeto.id;
-  }
-
-  getById(id) {
-    const resultObject = this.array.find((object) => object.id === id);
-    if (resultObject) {
-      return resultObject;
-    }
-    return null;
-  }
-
-  getAll() {
-    const fs = require("fs");
-    fs.readFile(this.fileName, "utf-8", (error, data) => {
-      if (error) {
-        throw new Error("No se encontró el archivo" + this.fileName);
-      }
-      //Acá encuentro un error que me devuelve un undefined
-      console.log(JSON.parse(data));
+  async save(objeto) {
+    await this.getAll();
+    this.id++;
+    this.data.push({
+      id: this.id,
+      product: objeto,
     });
-  }
-
-  deleteById(id) {
-    const resultObject = this.array.find((object) => object.id === id);
-    if (resultObject) {
-      //Elimino el array con el id ingresado
-      this.array.splice(id, id);
-      const fs = require("fs");
-      fs.writeFileSync(
+    try {
+      await fs.promises.writeFile(
         this.fileName,
-        JSON.stringify(this.array, null, 2),
-        (error) => {
-          throw new Error("No se guardó el archivo. Error:", error);
-        }
+        JSON.stringify(this.data, null, 2)
       );
-      return "El archivo con el id", id, "fue eliminado";
+      //Devuelvo los id asignados
+      return console.log("El id del objeto ingresado es", this.id);
+    } catch (error) {
+      console.log(error);
     }
   }
 
-  deleteById(id) {
-    const fs = require("fs");
-    fs.unlink("fileName", (error) => {
-      if (error) {
-        ("No se encontró ningún archivo con ese id");
-      } else {
-        console.log("¡Borrado!");
+  async getById(id) {
+    await this.getAll();
+    try {
+      await fs.promises.writeFile(
+        this.fileName,
+        JSON.stringify(this.data, null, 2)
+      );
+      //Busco el objeto con ese id
+      const objetoId = this.data.find((dat) => dat.id === id);
+      if (objetoId) {
+        return console.log("El objeto con el id", id, "es", objetoId);
       }
-    });
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async getAll() {
+    //Manejo error con try catch
+    try {
+      const data = await fs.promises.readFile(this.fileName, "utf-8");
+      if (data) {
+        //Paso data a un objeto
+        this.data = JSON.parse(data);
+        this.data.map((producto) => {
+          //Obtengo cual es el id máximo del archivo
+          if (this.id < producto.id) this.id = producto.id;
+        });
+      }
+    } catch (error) {
+      //Si hay un error que no retorne nada. Que siga.
+      return;
+    }
+  }
+
+  async deleteById(id) {
+    await this.getAll();
+    try {
+      await fs.promises.writeFile(
+        this.fileName,
+        JSON.stringify(this.data, null, 2)
+      );
+      //Elimino el objeto con ese id
+      this.data.splice(id, id);
+      //Devuelvo los id asignados
+      return console.log("El archivo con el id", id, "fue eliminado.");
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   deleteAll() {
@@ -85,45 +104,19 @@ class Contenedor {
             throw new Error("No se guardó el archivo. Error:", error);
           }
         );
-      } console.log("¡Borrado!");
+      }
+      console.log("¡Borrado!");
     });
   }
 }
 
-//save()
-let objetoContenedor = new Contenedor("ArchvoDesafio.txt");
-let objetoHeladera = {
-  title: "Heladera",
-  price: 80000,
-};
-let agregoObjetoHeladera = objetoContenedor.save(objetoHeladera);
-console.log("El id de ese objeto es", agregoObjetoHeladera);
-let objetoLavarropas = {
-  title: "Lavarropas",
-  price: 60000,
-};
-let agregoObjetoLavarropas = objetoContenedor.save(objetoLavarropas);
-console.log("El id de ese objeto es", agregoObjetoLavarropas);
+const objetoContenedor = new Contenedor("ArchvoDesafio.txt");
 
-//getById()
-let buscoObjetoConId = objetoContenedor.getById(3);
-console.log("El objeto con ese id es", buscoObjetoConId);
+async function newFunction() {
+  await objetoContenedor.save(p1);
+  await objetoContenedor.save(p2);
+  await objetoContenedor.getById(8);
+  await objetoContenedor.deleteById(2);
+}
 
-//getAll()
-let arrayConTodosLosObjetos = objetoContenedor.getAll();
-//Acá encuentro un error que me devuelve un undefined
-console.log(
-  "El array con todos los objetos es este:\n",
-  arrayConTodosLosObjetos
-);
-
-//deleteById()
-let eliminoObjetoConId = objetoContenedor.deleteById(1);
-console.log(
-  "El archivo con el array eliminado quedó de esta forma",
-  eliminoObjetoConId
-);
-
-//deleteAll()
-let eliminoTodosLosObjetos = objetoContenedor.deleteAll();
-console.log("El archivo quedó sin objetos", eliminoTodosLosObjetos);
+newFunction();
