@@ -75,7 +75,7 @@ class Contenedor {
     }
   }
 
-  async deleteById(id) {
+  async deleteById(idOut) {
     await this.getAll();
     try {
       await fs.promises.writeFile(
@@ -83,7 +83,7 @@ class Contenedor {
         JSON.stringify(this.data, null, 2)
       );
       //Elimino el objeto con ese id
-      this.data.splice(id, id);
+      const objetoSinId = this.data.filter(dat => dat.id != idOut)
       //Devuelvo los id asignados
       return console.log("El archivo con el id", id, "fue eliminado.");
     } catch (error) {
@@ -91,23 +91,23 @@ class Contenedor {
     }
   }
 
-  deleteAll() {
-    const fs = require("fs");
-    fs.unlink(this.fileName, (error) => {
-      if (error) {
-        ("No se encontró ningún archivo con ese id");
-      } else {
-        fs.writeFileSync(
-          this.fileName,
-          JSON.stringify(this.array, null, 2),
-          (error) => {
-            throw new Error("No se guardó el archivo. Error:", error);
-          }
-        );
-      }
-      console.log("¡Borrado!");
-    });
-  }
+  // deleteAll() {
+  //   const fs = require("fs");
+  //   fs.unlink(this.fileName, (error) => {
+  //     if (error) {
+  //       ("No se encontró ningún archivo con ese id");
+  //     } else {
+  //       fs.writeFileSync(
+  //         this.fileName,
+  //         JSON.stringify(this.array, null, 2),
+  //         (error) => {
+  //           throw new Error("No se guardó el archivo. Error:", error);
+  //         }
+  //       );
+  //     }
+  //     console.log("¡Borrado!");
+  //   });
+  // }
 }
 
 const objetoContenedor = new Contenedor("ArchvoDesafio.txt");
