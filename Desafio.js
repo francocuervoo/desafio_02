@@ -76,18 +76,23 @@ class Contenedor {
   }
 
   async deleteById(id) {
-    await this.getAll();
     try {
-      //Elimino el objeto con ese id
-      const objetoSinId = this.data.filter((dat) => dat.id != id);
-      console.log("ACA", objetoSinId);
-      await fs.promises.writeFile(
-        this.fileName,
-        JSON.stringify(this.data, null, 2)
-      );
-      return console.log("El objeto con el id", id, "fue eliminado.");
+      const data = await fs.promises.readFile(this.fileName, "utf-8");
+      if (data) {
+        //Paso data a un objeto
+        this.data = JSON.parse(data);
+        //Nuevo array sin el objeto con el id pasado
+        const objetoSinId = this.data.filter((dat) => dat.id != id);
+        //Guardo el nuevo array en el archivo
+        await fs.promises.writeFile(
+          this.fileName,
+          JSON.stringify(objetoSinId, null, 2)
+        );
+        console.log(`El producto con el id ${id} ufe eliminado.`);
+      }
     } catch (error) {
-      console.log(error);
+      //Si hay un error que no retorne nada. Que siga.
+      return;
     }
   }
 
@@ -111,8 +116,8 @@ async function newFunction() {
   await objetoContenedor.save(p1);
   await objetoContenedor.save(p2);
   await objetoContenedor.getById(8);
-  await objetoContenedor.deleteById(1);
-  await objetoContenedor.deleteAll();  
+  await objetoContenedor.deleteById(5);
+  //await objetoContenedor.deleteAll();
 }
 
 newFunction();
